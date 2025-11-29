@@ -1,12 +1,10 @@
-name: Terraform Deploy
+name: Terraform Destroy
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:   # Uncomment if you want manual trigger too
+  workflow_dispatch:   # 🔥 Manual trigger only (recommended for safety)
 
 jobs:
-  terraform:
+  terraform-destroy:
     runs-on: ubuntu-latest
 
     env:
@@ -15,22 +13,55 @@ jobs:
       AWS_DEFAULT_REGION: us-east-1
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.8.0"   # optional but recommended
 
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy -out=tfplan
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
+      - name: Terraform Apply Destroy
         run: terraform apply -auto-approve tfplan
+
+
+# name: Terraform Deploy
+
+# on:
+#   push:
+#     branches: [ main ]
+#   workflow_dispatch:   # Uncomment if you want manual trigger too
+
+# jobs:
+#   terraform:
+#     runs-on: ubuntu-latest
+
+#     env:
+#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#       AWS_DEFAULT_REGION: us-east-1
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+#         with:
+#           terraform_version: "1.8.0"   # optional but recommended
+
+#       - name: Terraform Init
+#         run: terraform init
+
+#       - name: Terraform Validate
+#         run: terraform validate
+
+#       - name: Terraform Plan
+#         run: terraform plan -out=tfplan
+
+#       - name: Terraform Apply
+#         run: terraform apply -auto-approve tfplan
